@@ -1,0 +1,350 @@
+<html>
+<head>
+
+
+<?php
+
+/**
+ * @file
+ * Default theme implementation for displaying search results.
+ *
+ * This template collects each invocation of theme_search_result(). This and
+ * the child template are dependent to one another sharing the markup for
+ * definition lists.
+ *
+ * Note that modules may implement their own search type and theme function
+ * completely bypassing this template.
+ *
+ * Available variables:
+ * - $search_results: All results as it is rendered through
+ *   search-result.tpl.php
+ * - $module: The machine-readable name of the module (tab) being searched, such
+ *   as "node" or "user".
+ *
+ *
+ * @see template_preprocess_search_results()
+ *
+ * @ingroup themeable
+ */
+?>
+
+<?php
+#Talener erecruit API intergration authored by Mario Moorhead Blackskymedia 2014 
+
+##Settings
+//$serviceRoot = "https://www.googleapis.com/customsearch/v1?key=AIzaSyCCqoviCkIn9r1g9C-J4fk8KsYBOTYbTYg&cx=014406451773668960390:26p9obuogkg&q=mario%20moorhead";
+$root = "http://localhost:8983/solr/";
+//$google = "014406451773668960390:26p9obuogkg";
+//$public = "014406451773668960390:ocsd6xtfywk";
+//$key = "AIzaSyCCqoviCkIn9r1g9C-J4fk8KsYBOTYbTYg";
+//$public = "014406451773668960390:qp59s5he9m8";
+$action = "select?q=";
+$term = "id";
+
+$searchTerms = explode("/", $_REQUEST['q']);
+$searchTerm = urlencode($searchTerms[2]);
+$searchTerm = 'poopy';
+echo $searchTerm;
+
+
+
+
+##End Settings
+
+//$alldone = 0;
+//$positionID = 9130;
+//$c = authenticate($serviceRoot, $username, $password, $entityID);
+
+//$slipknot = 0;
+//$fakeme = $positionID;
+
+//$positionID ++;
+//$results2 = getPosition($c, $serviceRoot, $positionID, $entityID);
+$words = 'lung';
+//$results1 = getPublicSearch($public, $root, $key, $searchTerm);
+//var_dump($results1);
+//$words = 'mario%20moorhead';
+//$results2 = getGoogleSearch($google, $root, $key, $searchTerm);
+//var_dump($results2);
+$results3 = getBing($searchTerm);
+
+$results4 = findPublic($searchTerm);
+?>
+
+
+
+<?php if ($search_results): ?>
+  <h2><?php print t('Internal Search results');?></h2>
+
+  <ol class="search-results <?php print $module; ?>-results">
+    <?php print $search_results; ?>
+  </ol>
+  <?php print $pager; ?>
+<?php else : ?>
+  <h2><?php print t('Your search yielded no results');?></h2>
+  <?php print search_help('search#noresults', drupal_help_arg()); ?>
+<?php endif; ?>
+
+
+
+
+
+
+<?php if ($results4): ?>
+  <h2><?php print t('Public Search results');?></h2>
+
+  <ol class="search-results" <?php echo $results4;?> </ol>
+  
+  <?php endif; ?>
+
+
+
+
+
+
+
+
+
+
+
+
+  <?php
+  print '<pre>';
+
+//if (is_array($results2))
+  //echo 'ARRAY';
+
+//if (is_string($results2)){
+  //echo 'STRING';
+ // print_r($results2);
+//}
+
+//$keyTerm = minisearch_search_preprocess();
+//echo $vars['myvar'];
+//echo $keyTerm;
+//$arr = json_decode($results1, true);
+//var_dump($arr);
+
+
+
+
+
+
+  //foreach ($arr as $key => $value) {
+   // echo '<- '.$key.' ';
+    //if ($key == 'items'){
+    //print_r($value);
+      //print_r($items['snippet']);
+    //}
+  //}
+
+  //$apple = search_get_keys();
+  //echo $apple;
+ // var_dump(get_defined_vars()); 
+ print '</pre>';
+?>
+
+
+
+
+
+<?php
+
+function getGoogleSearch($google, $root, $key, $words)
+{
+  $url = "$root?key=$key&cx=$google&q=$words";
+ // drupal_set_message($url, 'error');
+
+   //$url = $serviceRoot;
+  
+  // curl_setopt(CURLOPT_URL, $url);
+  // curl_setopt(CURLOPT_HTTPGET, true);
+  // curl_setopt(CURLOPT_HEADER, false);
+  
+  // $result = curl_exec($c);
+
+
+  // return $result;
+
+
+    $ch = curl_init();
+  $timeout = 5;
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+  $data = curl_exec($ch);
+  curl_close($ch);
+  return $data;
+}
+
+
+
+function getPublicSearch($public, $root, $key, $words)
+{
+  $url = "$root?key=$key&cx=$public&q=$words";
+
+
+
+  //drupal_set_message($url, 'error');
+  //$url = $serviceRoot;
+  
+  // curl_setopt(CURLOPT_URL, $url);
+  // curl_setopt(CURLOPT_HTTPGET, true);
+  // curl_setopt(CURLOPT_HEADER, false);
+  
+  // $result = curl_exec($c);
+
+
+  // return $result;
+
+
+  $ch = curl_init();
+  $timeout = 5;
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+  $data = curl_exec($ch);
+  curl_close($ch);
+  return $data;
+}
+
+function getBing($searchTerm)
+{
+$acctKey  = 'SFfjrh90LTb+FRxztMIKzrislAyFtUXXu9BPBI3S820';
+$rootUri = 'https://api.datamarket.azure.com/Bing/Search';
+
+
+    // Encode the query and the single quotes that must surround it.
+  $query = "'$searchTerm'";
+    
+  // Get the selected service operation (Web or Image).
+  $serviceOp = 'Web';
+
+  //var_dump($serviceOp);
+
+  // Construct the full URI for the query.
+  $requestUri = "$rootUri/$serviceOp?\$format=json&Query=$query";
+
+  // Encode the credentials and create the stream context.
+  $auth = base64_encode("$acctKey:$acctKey");
+  $data = array(
+    'http' => array(
+      'request_fulluri' => true,
+      // ignore_errors can help debug – remove for production. This option added in PHP 5.2.10
+      'ignore_errors' => true,
+      'header'  => "Authorization: Basic $auth")
+    );
+  $context = stream_context_create($data);
+
+  // Get the response from Bing.
+  $response = file_get_contents($requestUri, 0, $context);
+
+//var_dump($response);
+
+  // Decode the response.
+  $jsonObj = json_decode($response);
+
+  $resultStr = '<div id="bing">';
+  $i=0;
+  // Parse each result according to its metadata type.
+  foreach($jsonObj->d->results as $value)
+  {
+    switch ($value->__metadata->type)
+    {
+      case 'WebResult':
+        if($i<4){
+        $resultStr .= 
+          "<a href=\"{$value->Url}\">{$value->Title}</a><p>{$value->Description}</p>";
+      }
+          $i++;
+        break;  
+    }
+  }
+
+$resultStr .= "</div>";
+
+//echo $resultStr;
+
+return $resultStr;
+}
+
+
+
+
+
+
+
+
+function findPublic($searchTerm)
+{
+$acctKey  = 'SFfjrh90LTb+FRxztMIKzrislAyFtUXXu9BPBI3S820';
+$rootUri = 'https://api.datamarket.azure.com/Bing/Search';
+
+
+    // Encode the query and the single quotes that must surround it.
+  $query = "'$searchTerm(site:nhlbi.nih.gov)'";
+    
+  // Get the selected service operation (Web or Image).
+  $serviceOp = 'Web';
+
+  //var_dump($serviceOp);
+
+  // Construct the full URI for the query.
+  $requestUri = "$rootUri/$serviceOp?\$format=json&Query=$query";
+
+  // Encode the credentials and create the stream context.
+  $auth = base64_encode("$acctKey:$acctKey");
+  $data = array(
+    'http' => array(
+      'request_fulluri' => true,
+      // ignore_errors can help debug – remove for production. This option added in PHP 5.2.10
+      'ignore_errors' => true,
+      'header'  => "Authorization: Basic $auth")
+    );
+  $context = stream_context_create($data);
+
+  // Get the response from Bing.
+  $response = file_get_contents($requestUri, 0, $context);
+
+//var_dump($response);
+
+  // Decode the response.
+  $jsonObj = json_decode($response);
+
+  $resultStr = '<div id="bing">';
+  $i=0;
+  // Parse each result according to its metadata type.
+  foreach($jsonObj->d->results as $value)
+  {
+    switch ($value->__metadata->type)
+    {
+      case 'WebResult':
+        if($i<4){
+        $resultStr .= 
+          "<a href=\"{$value->Url}\">{$value->Title}</a><p>{$value->Description}</p>";
+      }
+          $i++;
+        break;  
+    }
+  }
+
+$resultStr .= "</div>";
+
+//echo $resultStr;
+
+return $resultStr;
+}
+
+
+
+
+
+
+
+?>
+
+
+</head>
+<body>
+
+
